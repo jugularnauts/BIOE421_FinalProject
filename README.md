@@ -26,12 +26,15 @@ in order to isolate pulsations of the jugular vein.
 11/3: Project abstract due
 - Publish final abstract to Github
 - Prototype Processing GUI visualization using CircuitPlayground accelerometer data
+
 11/9: Initial prototype due
 - Replace CircuitPlayground w/ 3x1 accelerometer array (if parts arrive) or 10x1 J-STAT prototype
 - Implement heart rate sensor acquisition and visualization (if parts arrive)
+
 11/16: Fit and finish due
 - Finalize GUI for visualization of raw signals
 - Explore signal localization and subtraction of carotid pulse (heart beat)
+
 11/28: Final code due
 - Finalize additional features (signal localization and subtraction) 
 
