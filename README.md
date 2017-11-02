@@ -12,27 +12,28 @@ a Rice University senior engineering design team.
 
 ### Abstract
 This device will serve as a realtime information display for use in developing a device to measure jugular venous pressure,
-as part of Team Jugularnauts' senior design project. Preliminary prototypes will feature raw data acquisition from a 3x1 accelerometer
-array and an optical heart rate sensor. The accelerometers will be interfaced with Arduino through the I2C communications protocol, 
-and the heart rate sensor will be connected through a single analog input. Arduino will be used for its precise timing capabilities,
-which are important for accurate signal subtraction, and will be connected to Raspberry Pi to provide realtime visual display of raw data 
-through a Processing GUI. Future implementations may incorporate other desired features, including signal localization and signal processing.
-Signal localization may be explored through a “stud finder” mechanism, through which the strength of the signal corresponds to visual
-feedback on the Processing GUI, allowing the user to place the device correctly over the location of strongest signal 
-(i.e., over the carotid/jugular bundle). Signal processing may be explored for reducing noise and subtracting competing physiologic signals,
-in order to isolate pulsations of the jugular vein.
+as part of Team Jugularnauts' senior design project. Preliminary prototypes will feature raw data acquisition from a 2x1 accelerometer
+array and an optical heart rate sensor. The accelerometers and heart rate sensor will be interfaced with Arduino through analog input pins.
+Arduino will be used for its precise timing capabilities, which are important for accurate signal subtraction, and will be connected to 
+Raspberry Pi to provide realtime visual display of raw data through a Processing GUI. Future implementations may incorporate other desired 
+features, including signal localization and signal processing. Signal localization may be explored through a “stud finder” mechanism, through 
+which the strength of the signal corresponds to visual feedback on the Processing GUI, allowing the user to place the device correctly over the 
+location of strongest signal (i.e., over the carotid/jugular bundle). Signal processing may be explored for reducing noise and subtracting 
+competing physiologic signals, in order to isolate pulsations of the jugular vein.
 
 ### Milestones, Goals, and Due Dates
 11/3: Project abstract due
 - Publish final abstract to Github
-- Prototype Processing GUI visualization using CircuitPlayground accelerometer data
+- Prototype Processing GUI visualization using data from single ADXL335 accelerometer
 
 11/9: Initial prototype due
-- Replace CircuitPlayground w/ 3x1 accelerometer array (if parts arrive) or 10x1 J-STAT prototype
+- Prototype vizualization with 2x1 accelerometer array
 - Implement heart rate sensor acquisition and visualization (if parts arrive)
+- 3D print casing for device to be used on human neck, rather than affixed to breadboard
 
 11/16: Fit and finish due
 - Finalize GUI for visualization of raw signals
+- Assemble 3D printed casing and hardware components
 - Explore signal localization and subtraction of carotid pulse (heart beat)
 
 11/28: Final code due
