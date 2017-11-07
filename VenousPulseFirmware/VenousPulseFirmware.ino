@@ -1,11 +1,12 @@
 // Modifications to exmaple code provided by AdaFruit for acquiring data from ADXL335 accelerometers
 // Angela Zhang and Nick Calafat
 // BIOE 421, Rice University
-// 11.2.2017
+// 11.6.2017
+// 11.6 updates: data acquisition with 2 accelerometers, 1-axis (Z)
+//                string w/ data sent to Processing for plotting
 
-const int xInput = A0;
-const int yInput = A1;
-const int zInput = A2;
+const int zInput1 = A0;
+const int zInput2 = A1;
 
 // values from calibration
 // sensor 1 (yellow side highlight)
@@ -36,6 +37,8 @@ int yRawMax2 = 604;
 int zRawMin2 = 424;
 int zRawMax2 = 631;
 
+// store data in string to send to Processing
+String Accel_string;
 
 // Take multiple samples to reduce noise
 const int sampleSize = 50;
@@ -49,44 +52,39 @@ Serial.begin(9600);
 void loop() {
 // put your main code here, to run repeatedly:
 
-int xRaw1 = ReadAxis(xInput);
-int yRaw1 = ReadAxis(yInput);
-int zRaw1 = ReadAxis(zInput);
+int zRaw1 = ReadAxis(zInput1);
+int zRaw2 = ReadAxis(zInput2);
 
 //Serial.println("Raw values");
-//Serial.print("X: ");
-//Serial.print(xRaw1);
-//Serial.print(", Y: ");
-//Serial.print(yRaw1);
-//Serial.print(", Z: ");
-Serial.println(zRaw1); 
+//Serial.print("Z-1: ");
+//Serial.println(zRaw1);
+//Serial.print(", Z-2: ");
+//Serial.println(zRaw2);
 //Serial.println();
 
   
-  // Convert raw values to 'milli-Gs"
-  long xScaled = map(xRaw1, xRawMin1, xRawMax1, -1000, 1000);
-  long yScaled = map(yRaw1, yRawMin1, yRawMax1, -1000, 1000);
-  long zScaled = map(zRaw1, zRawMin1, zRawMax1, -1000, 1000);
+// Convert raw values to 'milli-Gs"
+long zScaled1 = map(zRaw1, zRawMin1, zRawMax1, -1000, 1000);
+long zScaled2 = map(zRaw2, zRawMin2, zRawMax2, -1000, 1000);
 
-  // re-scale to fractional Gs
-  float xAccel = xScaled / 1000.0;
-  float yAccel = yScaled / 1000.0;
-  float zAccel = zScaled / 1000.0;
+// re-scale to fractional Gs
+float zAccel1 = zScaled1 / 1000.0;
+float zAccel2 = zScaled2 / 1000.0;
 
-  //Serial.println("Acceleration");
-  //Serial.print("X: ");
-  //Serial.print(xAccel);
-  //Serial.print("G, ");
-  //Serial.print(", Y: ");
-  //Serial.print(yAccel);
-  //Serial.print("G, ");
-  //Serial.print(", Z: ");
-  //Serial.print(zAccel);
-  //Serial.println("G");
-  //Serial.println();
+//Serial.println("Acceleration");
+//Serial.print("Z-1: ");
+//Serial.print(zAccel1);
+//Serial.print("G");
+//Serial.print(", Z-2: ");
+//Serial.print(zAccel2);
+//Serial.println("G");
+//Serial.println();
 
 //delay(500);
 
+Accel_string = String(zAccel1) + ";" + String(zAccel2);
+Serial.print(Accel_string);
+Serial.print('\n');
 }
 
 //
