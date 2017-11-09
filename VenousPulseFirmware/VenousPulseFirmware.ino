@@ -1,7 +1,6 @@
-// Modifications to exmaple code provided by AdaFruit for acquiring data from ADXL335 accelerometers
 // Angela Zhang and Nick Calafat
 // BIOE 421, Rice University
-// 11.6.2017
+// 11.2.2017: Modifications to exmaple code provided by AdaFruit for acquiring data from ADXL335 accelerometers
 // 11.6 updates: data acquisition with 2 accelerometers, 1-axis (Z)
 //                string w/ data sent to Processing for plotting
 
