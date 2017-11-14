@@ -3,9 +3,14 @@
 // 11.2.2017: Modifications to exmaple code provided by AdaFruit for acquiring data from ADXL335 accelerometers
 // 11.6 updates: data acquisition with 2 accelerometers, 1-axis (Z)
 //                string w/ data sent to Processing for plotting
+// 11.14 updates: added data acquisition from pulse sensor
 
+#include <math.h>  // include math library
+
+// define analog input pins
 const int zInput1 = A0;
 const int zInput2 = A1;
+const int ECG_Input = A2; 
 
 // values from calibration
 // sensor 1 (yellow side highlight)
@@ -22,7 +27,7 @@ int yRawMax1 = 608;
 int zRawMin1 = 444;
 int zRawMax1 = 650;
 
-// sensor 2 (ugly soldering)
+// Calibration values sensor 2 (ugly soldering)
 // Raw Ranges: X: 406-609, Y: 401-604, Z: 424-631
 // 501, 493, 628 :: -0.07G, -0.09G, 0.97G
 
@@ -51,8 +56,10 @@ Serial.begin(9600);
 void loop() {
 // put your main code here, to run repeatedly:
 
+// collect data samples
 int zRaw1 = ReadAxis(zInput1);
 int zRaw2 = ReadAxis(zInput2);
+int rawECG = ReadAxis(ECG_Input);
 
 //Serial.println("Raw values");
 //Serial.print("Z-1: ");
@@ -61,8 +68,7 @@ int zRaw2 = ReadAxis(zInput2);
 //Serial.println(zRaw2);
 //Serial.println();
 
-  
-// Convert raw values to 'milli-Gs"
+// Convert raw accel values to Gs
 long zScaled1 = map(zRaw1, zRawMin1, zRawMax1, -1000, 1000);
 long zScaled2 = map(zRaw2, zRawMin2, zRawMax2, -1000, 1000);
 
@@ -79,11 +85,16 @@ float zAccel2 = zScaled2 / 1000.0;
 //Serial.println("G");
 //Serial.println();
 
-//delay(500);
+//delay(50);
 
-Accel_string = String(zAccel1) + ";" + String(zAccel2);
+//if (!isnan(zAccel1) && !isnan(zAccel2) && !isnan(rawECG)) { 
+
+// send data over to Processing
+Accel_string = String(zAccel1) + ";" + String(zAccel2) + ";" + String(rawECG);
 Serial.print(Accel_string);
 Serial.print('\n');
+
+//}
 }
 
 //
@@ -100,3 +111,4 @@ for (int i = 0; i < sampleSize; i++)
 }
 return reading/sampleSize;
 }
+
