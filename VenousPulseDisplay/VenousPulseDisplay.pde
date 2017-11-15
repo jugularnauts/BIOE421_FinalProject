@@ -1,18 +1,17 @@
 // Angela Zhang and Nick Calafat
 // BIOE 421, Rice University
-// 11.2.2017 Modification to existing example graphing code (credited below) for visualizing accelerometer data
+// 11.2.2017 Modification to existing example graphing code (credited below) for visualizing accelerometer and pulse sensor data
 // 11.6.2017 updates: split data from Arduino string to acceleration values for each accelerometer, plot each in its own graph
 // 11.7.2017 updates: add text displaying acceleration values (g) for each accelerometer
 // 11.8.2017 updates: add scales, confine each graph to its own window
 // 11.14.2017 updates: overlay pulse waveform over bottom graph
+//                     clean up code; create single function for plotting; plot all graphs on same window in unique colors
 
 // Processing code for this example
 // Graphing sketch
-
   // This program takes ASCII-encoded strings from the serial port at 9600 baud
   // and graphs them. It expects values in the range 0 to 1023, followed by a
   // newline, or newline and carriage return
-
   // created 20 Apr 2005
   // updated 24 Nov 2015
   // by Tom Igoe
@@ -24,24 +23,28 @@
 
   Serial myPort;        // create variable for the serial port
   int xPos = 200;         // initialize horizontal position of the graph for graphing
-  float prevZ1 = 0;     // create variables for storing current and previous Z values
-  float prevZ2 = 0;
-  float prevECG = 0;
-  float Z1 = 0;
-  float Z2 = 0;
-  float ECG = 0;
-  float Z1_scaled = 0;
-  float Z2_scaled = 0;
-  float ECG_scaled = 0;
-  int g_min = -3;
-  int g_max = 3;
-  float[] rawECG;
-//  float[] rawZ2;
-  float[] scaledECG;
-//  float[] scaledZ2;
-
-  int textcolor = 0;
-  int backgroundcolor = 255;
+  
+  // initialize variables to store / plot accelerometer and ECG data
+  float Z1raw;
+  float Z1old;
+  float Z1new;
+  float Z2raw;
+  float Z2old;
+  float Z2new;
+  float ECGraw;
+  float ECGold;
+  float ECGnew;
+  
+  //float[] Z1 = new float[1000];
+  //float[] Z2 = new float[1000];
+  //float[] ECG = new float[1000];
+  
+  // store color codes
+  int[] red = {255,0,0};
+  int[] green = {0,255,0};
+  int[] blue = {0,0,255};
+  int black = 0;
+  int white = 255;
 
   void setup () {
     // set the window size:
@@ -61,96 +64,48 @@
     myPort.bufferUntil('\n');
 
     // set initial background color:
-    background(backgroundcolor);
-    
-    // draw bounding boxes for graphs:
-    stroke(textcolor);
-    strokeWeight(3);
-    noFill();
-    rect(0,0,1199,449);
-    rect(0,height/2,1199,449);
-   
+    background(white);
   }
 
   void draw () {
-    // draw sidebar and scales
-    stroke(textcolor);
-    fill(textcolor);
+    // draw sidebar and y-scale
+    stroke(black);
+    fill(white);
     rect(0,0,200,height);
     
     textFont(f,25);
-    fill(backgroundcolor);
-    text("2 g",125,1*height/12);
-    text("1 g",125,2*height/12);
-    text("0 g",125,3*height/12);
-    text("-1 g",125,4*height/12);
-    text("-2 g",125,5*height/12);
+    fill(black);
+    text("2 g",125,1*height/6);
+    text("1 g",125,2*height/6);
+    text("0 g",125,3*height/6);
+    text("-1 g",125,4*height/6);
+    text("-2 g",125,5*height/6);
     
-    text("2 g",125,7*height/12);
-    text("1 g",125,8*height/12);
-    text("0 g",125,9*height/12);
-    text("-1 g",125,10*height/12);
-    text("-2 g",125,11*height/12);
-    
-    // for the first accelerometer
-    // draw line connecting data points
-    stroke(textcolor);
-    strokeWeight(1);
-    noFill();
-    line(xPos-1, height/2 - prevZ1, xPos, height/2 - Z1_scaled);
-    
-    
-     //rolling graph code -- in development
-     
-    //for (int i = 0; i < rawECG.length-1; i++) {      // move the pulse waveform by
-    //  rawECG[i] = rawECG[i+1];                         // shifting all raw datapoints one pixel left
-    //}
-    //stroke(250,0,0);                               // red is a good color for the pulse waveform
-    //noFill();
-    //beginShape();                                  // using beginShape() renders fast
-    //for (int x = 1; x < scaledECG.length-1; x++) {
-    //  vertex(x+10, scaledECG[x]);                    //draw a line connecting the data points
-    //}
-    //endShape();
-    
-    
-    // print current acceleration
+    // print current acceleration 1
     textFont(f,25);
-    fill(backgroundcolor);
-    text("Accel 1:",10,height/2-10);
-    text(Z1,100,height/2-10);
-    text('g',175, height/2-10);
+    fill(blue[0],blue[1],blue[2]);
+    text("Accel 1:",10,25);
+    text(Z1raw,100,25);
+    text('g',175, 25);
     
-    // for the second accelerometer
-    // draw line connecting data points
-    stroke(textcolor);
-    strokeWeight(1);
-    noFill();
-    line(xPos-1, height - prevZ2, xPos, height - Z2_scaled);
-    
-    // for pulse sensor
-    // draw line connecting data points
-    line(xPos-1, height - prevECG, xPos, height - ECG_scaled);
-    
-     // print current acceleration
+    // print current acceleration 2
     textFont(f,25);
-    fill(backgroundcolor);
-    text("Accel 2:",10,height/2+20);
-    text(Z2,100,height/2+20);
-    text('g',175, height/2+20);
+    fill(green[0],green[1],green[2]);
+    text("Accel 2:",10,60);
+    text(Z2raw,100,60);
+    text('g',175,60);
     
+    // call function to draw each new data point
+    drawLine(Z1old,Z1new, blue);
+    drawLine(Z2old,Z2new, green);
+    drawLine(ECGold,ECGnew, red);
    
     // at the edge of the screen, go back to the beginning:
     if (xPos >= width) {
       xPos = 200;
-      background(backgroundcolor);
-      
-      stroke(textcolor);
-      noFill();
-      rect(0,0,1199,449);
-      rect(0,height/2,1199,449);
-      
-      // draw sidebar and scale
+      background(white);
+
+      // draw sidebar and scale again
       stroke(255);
       fill(255);
       rect(0,0,200,height);
@@ -172,36 +127,48 @@
       println(inString);
             
       // store past acceleration points
-      prevZ1 = Z1_scaled;
-      prevZ2 = Z2_scaled;
-      prevECG = ECG_scaled;
+      Z1old = Z1new;
+      Z2old = Z2new;
+      ECGold = ECGnew;
       
       
       // split the string at the semicolons
       String[] arduino_strings = split(inString, ';');
       
-      if(arduino_strings.length == 3) {
-      Z1 = float(arduino_strings[0]);
-      Z2 = float(arduino_strings[1]);
-      ECG = float(arduino_strings[2]);
+      if(arduino_strings.length == 3) {       // wait for all values (accel1, accel2, ECG) so program doesn't crash
+        Z1raw = float(arduino_strings[0]);
+        Z2raw = float(arduino_strings[1]);
+        ECGraw = float(arduino_strings[2]);
       }
       
-      //cap bottom graph at +3g so it stays in its window
-      
-      if (Z2 >= 3) {
-        Z2 = 3;
-      }
-      
-      //// print to processing window
-      //print("Z1:");
-      //println(Z1);
-      //print("Z2:");
-      //println(Z2);
-      //println();
-      // map acceleration and ECG to graph height
-      Z1_scaled = map(Z1,-3,3,0,height/2);
-      Z2_scaled = map(Z2,-3,3,0,height/2);
-      ECG_scaled = map(ECG, 300, 800, 0, height/2);
-      
+      Z1new = map(Z1raw,-3,3,0,height);       // map acceleration and ECG to graph height
+      Z2new = map(Z2raw,-3,3,0,height);
+      ECGnew = map(ECGraw,200,900,0,height);
+
+    }
   }
+  
+  void drawLine(float oldval, float newval, int[] c)
+  {
+    
+    // draw line in color specified (red green or blue)
+    stroke(c[0],c[1],c[2]);
+    strokeWeight(1);
+    noFill();
+    
+    line(xPos-1, height - oldval, xPos, height - newval);
+    
+    
+     //rolling graph code -- in development
+     
+    //for (int i = 0; i < rawECG.length-1; i++) {      // move the pulse waveform by
+    //  rawECG[i] = rawECG[i+1];                         // shifting all raw datapoints one pixel left
+    //}
+    //stroke(250,0,0);                               // red is a good color for the pulse waveform
+    //noFill();
+    //beginShape();                                  // using beginShape() renders fast
+    //for (int x = 1; x < scaledECG.length-1; x++) {
+    //  vertex(x+10, scaledECG[x]);                    //draw a line connecting the data points
+    //}
+    //endShape();
   }
