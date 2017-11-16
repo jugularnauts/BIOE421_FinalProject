@@ -6,6 +6,7 @@
 // 11.8.2017 updates: add scales, confine each graph to its own window
 // 11.14.2017 updates: overlay pulse waveform over bottom graph
 //                     clean up code; create single function for plotting; plot all graphs on same window in unique colors
+// 11.15.2017 updates: added realtime user-scaling function for accelerometers y-axis
 
 // Processing code for this example
 // Graphing sketch
@@ -18,6 +19,10 @@
   // This example code is in the public domain.
 
   import processing.serial.*;
+  import controlP5.*;
+  
+  ControlP5 cp5;
+  String textValue = "3";
   
   PFont f;              // initialize font f
 
@@ -34,6 +39,7 @@
   float ECGraw;
   float ECGold;
   float ECGnew;
+  float ymax;
   
   //float[] Z1 = new float[1000];
   //float[] Z2 = new float[1000];
@@ -46,12 +52,13 @@
   int black = 0;
   int white = 255;
 
+
   void setup () {
     // set the window size:
     size(1200,900);
     
     // establish font f
-    f = createFont("Arial",16,true);
+    f = createFont("Arial",25,true);
     
     // List all the available serial ports
     // if using Processing 2.1 or later, use Serial.printArray()
@@ -65,35 +72,59 @@
 
     // set initial background color:
     background(white);
+    
+    // create controller object
+    cp5 = new ControlP5(this);
+    cp5.setColorBackground(color(255,255,255));
+    cp5.setColorForeground(color(0,0,0));
+    cp5.setFont(f);
+    cp5.setColorActive(color(0,0,0));
+    
+    // create textfield for user-scaling input
+    cp5.addTextfield("textValue")
+     .setColor(color(0,0,0))
+     .setColorCursor(color(0,0,0))
+     .setPosition(135,10)
+     .setSize(50,40)
+     .setFont(f)
+     .setFocus(true)
+     .setAutoClear(false)
+     .setValue("3")
+     ;
+     
   }
-
+   
+  
   void draw () {
+    // prevent crash when textfield is empty
+    try { Integer.parseInt(cp5.get(Textfield.class,"textValue").getText());
+    }  catch (NumberFormatException e) {
+      ymax = 3;
+    }  
+       
     // draw sidebar and y-scale
     stroke(black);
     fill(white);
     rect(0,0,200,height);
+    drawScale();
     
     textFont(f,25);
     fill(black);
-    text("2 g",125,1*height/6);
-    text("1 g",125,2*height/6);
-    text("0 g",125,3*height/6);
-    text("-1 g",125,4*height/6);
-    text("-2 g",125,5*height/6);
+    text("Set max Y:",5,40);   
     
     // print current acceleration 1
     textFont(f,25);
     fill(blue[0],blue[1],blue[2]);
-    text("Accel 1:",10,25);
-    text(Z1raw,100,25);
-    text('g',175, 25);
+    text("Accel 1:",10,height-60);
+    text(Z1raw,100,height-60);
+    text('g',175, height-60);
     
     // print current acceleration 2
     textFont(f,25);
     fill(green[0],green[1],green[2]);
-    text("Accel 2:",10,60);
-    text(Z2raw,100,60);
-    text('g',175,60);
+    text("Accel 2:",10,height-25);
+    text(Z2raw,100,height-25);
+    text('g',175,height-25);
     
     // call function to draw each new data point
     drawLine(Z1old,Z1new, blue);
@@ -116,6 +147,18 @@
     }
   }
 
+void drawScale(){
+//read user-defined range for y-axis; create scale
+  textFont(f,25);
+  fill(black);
+  ymax = Float.parseFloat(textValue);       
+  for (int i=0; i<5; i++) {
+      float r = ymax*(1-((float) i+1)/3);
+      text(String.format("%.2f",r) + " g",120,(i+1)*height/6);
+    }  
+}
+  
+ 
   void serialEvent (Serial myPort) {
     // get the ASCII string:
     String inString = myPort.readStringUntil('\n');
@@ -123,8 +166,6 @@
     if (inString != null) {
       // trim off any whitespace:
       inString = trim(inString);
-      
-      println(inString);
             
       // store past acceleration points
       Z1old = Z1new;
@@ -141,8 +182,8 @@
         ECGraw = float(arduino_strings[2]);
       }
       
-      Z1new = map(Z1raw,-3,3,0,height);       // map acceleration and ECG to graph height
-      Z2new = map(Z2raw,-3,3,0,height);
+      Z1new = map(Z1raw,-ymax,ymax,0,height);       // map acceleration and ECG to graph height
+      Z2new = map(Z2raw,-ymax,ymax,0,height);
       ECGnew = map(ECGraw,200,900,0,height);
 
     }
