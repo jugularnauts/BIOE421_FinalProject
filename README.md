@@ -38,12 +38,14 @@ The ADXL335 breakout boards are designed to receive 5V power, which is regulated
 
 However, since the internal voltage reference on Arduino is only 1.1V, the analog reference pin should be used by feeding it a 3.3V supply from one of the ADXL accelerometers. This essentially tells the Arduino's analog to digital converter (ADC) what voltage range to expect from the input signals. Since the Pulse Sensor is referenced to this same voltage, it is essential to power it with 3.3V, even though the accelerometers are powered with 5V. This ensures that all output signals are on the same 0 -- 3.3V range. The wiring diagram for this configuration is presented below.
 
+![photo of basic hardware implementation](WiringDiagrams/BasicImplementationWiring.jpg)
+
 ##### Improving Signal Quality: Filtering and Amplification
 One major challenge we faced with this hardware was insufficient resolution. Since the accelerometer breakout boards are fixed at a -3g -- 3g acceleration range, the tiny forces produced by the jugular vein yield very small voltage changes from the accelerometers. This, paired with the 10-bit resolution for the Uno's analog input, yields a small signal that approaches the discretization limit of the ADC.
 
 To help solve this problem, we implemented a low-pass filter at 5 Hz to reduce noise and amplified the signal with a gain of 2.2 to bring the signal closer to the 5V maximum range for the ADC.
 
-This also required changes to the previous configuration. Since the new expected voltage range is 5V, the analog reference pin must also be fed 5V. Thus, the Pulse Sensor should also be powered and referenced to 5V. The wiring diagram for this configuration is presented below.
+This also required changes to the previous configuration. Since the new expected voltage range is 5V, the analog reference pin must also be fed 5V. Thus, the Pulse Sensor should also be powered and referenced to 5V. The wiring diagram for this configuration is presented below (coming soon).
 
 
 ### Software
