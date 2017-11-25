@@ -53,8 +53,9 @@ We used our Arduino Uno to acquire raw analog signals from the accelerometers an
 The Arduino sketch reads the raw voltages from each of the 3 sensors and performs sample averaging (n=50) to help smooth the data. The data points for each sensor are stored in a string which is sent to Processing via a serial connection.
 
 To change the number of points used in sample averaging, simply change the value of this line in the VenousPulseFirmware.ino sketch:
-``// Take multiple samples to reduce noise
-	const int sampleSize = 50;``
+
+			// Take multiple samples to reduce noise
+			   const int sampleSize = 50;
 
 ##### Processing
 Processing receives the strings of data from the Arduino Uno and parses them into individual data points. The data for each accleromter and the pulse sensor are then plotted on a single graph. This graph features a legend with the raw readings from each accelerometer and an adjustable y-axis scale. The boxes at the top and bottom of the scale allow for user input to adjust the range of data being displayed.
@@ -63,4 +64,4 @@ Processing receives the strings of data from the Arduino Uno and parses them int
 ### Acknowledgements
 Thanks to Dr. Jordan Miller and Madeleine Gomel for their advice and support throughout this semester.
 
-Thanks to [Arduino](www.arduino.cc), [Processing](www.processing.org), [Adafruit](www.adafruit.com), and [World Famous Electronics](https://pulsesensor.com/) for developing the hardware and software we needed to create our device.
+Thanks to [Arduino](https://www.arduino.cc), [Processing](https://www.processing.org), [Adafruit](https://www.adafruit.com), and [World Famous Electronics](https://pulsesensor.com/) for developing the hardware and software we needed to create our device.
