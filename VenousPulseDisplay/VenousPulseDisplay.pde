@@ -177,8 +177,8 @@
     
     // call function to draw each new data point
     drawLine(Z1old,Z1new, blue);
-    //drawLine(Z2old,Z2new, green);
-    //drawLine(ECGold,ECGnew, red);
+    drawLine(Z2old,Z2new, green);
+    drawLine(ECGold,ECGnew, red);
     
    
     // if at the edge of the screen, go back to the beginning:
